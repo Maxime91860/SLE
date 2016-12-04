@@ -1,0 +1,8 @@
+sudo service network-manager stop
+sudo ip a add 192.168.1.1/24 dev enp0s25
+ssh pi@192.168.1.5
+
+ip a
+sudo ip l set enp0s25 up --> active 
+sudo ip a add 192.168.1.1/24 dev enp0s25 --> donne une ip à enp0s25
+ip r ---> pour checker la table de routage
