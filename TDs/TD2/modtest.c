@@ -15,15 +15,18 @@
 par le noyau */
 
 short int irq_any_gpio = 0;
-DECLARE_TASKLET( my_tasklet, my_tasklet_function, (unsigned long) &my_tasklet_data );
+char my_tasklet_data[]="Appel de la fonction tasklet";
+
 
 
 
 // Fonction tasklet
 void my_tasklet_function( unsigned long data )
 {
-  printk( "Printk de la fonction tasklet\n", (char *)data );
+  printk( "Printk de la fonction tasklet\n");
 }
+
+DECLARE_TASKLET( my_tasklet, my_tasklet_function, (unsigned long) &my_tasklet_data );
 
 
 
@@ -49,7 +52,7 @@ int modtest_init(void)
     /* On demande l'accès au GPIO 18 */
     if (gpio_request(GPIO_ANY_GPIO, GPIO_ANY_GPIO_DESC)) {
         printk("GPIO request failure: %s\n", GPIO_ANY_GPIO_DESC);
-        return;
+        return 1;
     }
 
     /* On demande une ligne IRQ sur le GPIO 18 */
