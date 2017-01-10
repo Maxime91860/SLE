@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#projet-ase-2015">Projet ASE 2015</a><ul>
+<li><a href="#organisation-du-projet">Organisation du projet</a><ul>
+<li><a href="#objectif">Objectif</a></li>
+<li><a href="#constitution-des-groupes">Constitution des Groupes</a></li>
+<li><a href="#rendu">Rendu</a></li>
+<li><a href="#plagiat">Plagiat</a></li>
+</ul></li>
+<li><a href="#description-détaillée-du-projet">Description détaillée du projet</a></li>
+<li><a href="#contraintes">Contraintes</a></li>
+<li><a href="#prérequis">Prérequis</a><ul>
+<li><a href="#installation-et-utilisation-du-simulateur">Installation et utilisation du simulateur</a></li>
+<li><a href="#installation-et-utilisation-du-moniteur">Installation et utilisation du moniteur</a></li>
+</ul></li>
+<li><a href="#interfaçage-avec-le-moniteur">Interfaçage avec le moniteur</a></li>
+<li><a href="#spécifications-de-la-mission">Spécifications de la mission</a></li>
+<li><a href="#spécifications-du-robot">Spécifications du robot</a></li>
+<li><a href="#spécifications-de-la-caméra">Spécifications de la caméra</a></li>
+<li><a href="#remarques-finales">Remarques finales</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="projet-ase-2015"><a href="#projet-ase-2015">Projet ASE 2015</a></h1>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Version du document</th>
+<th align="left">Descriptif des changements</th>
+<th align="left">Auteur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0.0.1</td>
+<td align="left">Version initiale</td>
+<td align="left">Pablo Oliveira <script type="text/javascript">
+<!--
+h='&#x75;&#118;&#x73;&#x71;&#46;&#102;&#114;';a='&#64;';n='&#112;&#x61;&#98;&#108;&#x6f;&#46;&#x6f;&#108;&#x69;&#118;&#x65;&#x69;&#114;&#x61;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#112;&#x61;&#98;&#108;&#x6f;&#46;&#x6f;&#108;&#x69;&#118;&#x65;&#x69;&#114;&#x61;&#32;&#x61;&#116;&#32;&#x75;&#118;&#x73;&#x71;&#32;&#100;&#x6f;&#116;&#32;&#102;&#114;</noscript></td>
+</tr>
+</tbody>
+</table>
+<div class="figure">
+<img src="images/rover.jpg" title="NASA/JPL/Cornell University, Maas Digital LLC" alt="Vue d’artiste d’un robot Mars Rover, NASA/JPL/Cornell University" /><p class="caption">Vue d’artiste d’un robot Mars Rover, NASA/JPL/Cornell University</p>
+</div>
+<p>Ce document décrit l’objectif, l’organisation et la notation du projet ASE’15.</p>
+<p>Une version PDF de ce document est disponible à l’adresse <a href="http://tahiti.prism.uvsq.fr/ase/projet/Projet.pdf">http://tahiti.prism.uvsq.fr/ase/projet/Projet.pdf</a>.</p>
+<h2 id="organisation-du-projet"><a href="#organisation-du-projet">Organisation du projet</a></h2>
+<h3 id="objectif"><a href="#objectif">Objectif</a></h3>
+<p>Le but de ce projet est d’écrire un contrôleur pour un robot d’exploration, de type “Mars Rover”. Le robot doit se déplacer sur la surface de Mars et atteindre sa destination objectif. Pour pouvoir éviter les reliefs difficiles, le robot est doté d’une caméra qui mesure la distance. Votre contrôleur doit analyser les images de la caméra et donner des ordres de type TURN (tourner) ou FORWARD (avancer) au robot.</p>
+<p>De plus, le robot a des batteries limitées, votre contrôleur doit être le plus économe possible en énergie. Enfin, les capacités mémoire du robot sont contraintes, votre code doit avoir l’empreinte mémoire la plus faible.</p>
+<h3 id="constitution-des-groupes"><a href="#constitution-des-groupes">Constitution des Groupes</a></h3>
+<p>Ce projet est à faire par binôme ou trinôme.</p>
+<h3 id="rendu"><a href="#rendu">Rendu</a></h3>
+<p>Le projet est à rendre avant le lundi 16 février 2015 à 23h59. Le rendu du projet se fait par mail sur mon adresse pablo.oliveira@uvsq.fr. Le mail comportera obligatoirement le sujet “[ASE] Rendu projet”. L’ensemble des étudiants ayant participé au projet seront dans l’entête CC du mail.</p>
+<p>Le rendu comporte deux parties:</p>
+<ol style="list-style-type: decimal">
+<li>Un rapport, au format <code>pdf</code>, expliquant le travail réalisé et justifiant les choix d’implémentation effectués. En particulier, votre rapport apportera une réponse aux questions suivantes:</li>
+</ol>
+<ul>
+<li><p>Comment a été organisé le code de votre contrôleur ?</p></li>
+<li><p>Comment le robot évite les obstacles ?</p></li>
+<li><p>Comment le robot décide de la route pour atteindre l’objectif ? Est-ce la route la plus courte, si non pourquoi ?</p></li>
+<li><p>Quels mécanismes, simplifications d’algorithmes, etc. ont été mis en place pour économiser l’énergie ?</p></li>
+<li><p>Quels choix ont été fait pour réduire l’emprunte mémoire de votre code ?</p></li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Une archive, au format <code>.tar.gz</code>, contenant:</li>
+</ol>
+<ul>
+<li><p>un README avec le nom des auteurs et les éventuelles dépendances à installer avant de compiler votre code;</p></li>
+<li><p>un Makefile;</p></li>
+<li><p>l’ensemble de votre code <em>commenté</em>.</p></li>
+</ul>
+<p>Le rapport et l’archive seront joints au mail de rendu.</p>
+<h3 id="plagiat"><a href="#plagiat">Plagiat</a></h3>
+<p>Si vous empruntez du code il faut:</p>
+<ol style="list-style-type: decimal">
+<li><p>Citer sa provenance</p></li>
+<li><p>S’assurer que la licence du code vous permet de l’employer</p></li>
+</ol>
+<p>Vous pouvez discuter et collaborer entre groupes, mais il est strictement interdit de copier du code entre groupes.</p>
+<p>Il est interdit de publier votre code.</p>
+<p>Je vous invite à consulter les règles concernant le Plagiat de l’UVSQ: <a href="http://www.etu.uvsq.fr/jsp/saisie/liste_fichiergw.jsp?OBJET=DOCUMENT&amp;CODE=1409307985391&amp;LANGUE=0">http://www.etu.uvsq.fr/jsp/saisie/liste_fichiergw.jsp?OBJET=DOCUMENT&amp;CODE=1409307985391&amp;LANGUE=0</a></p>
+<h2 id="description-détaillée-du-projet"><a href="#description-détaillée-du-projet">Description détaillée du projet</a></h2>
+<h2 id="contraintes"><a href="#contraintes">Contraintes</a></h2>
+<p>Votre code sera codé en C ou/et en assembleur ARM. Vous essayerez au maximum de réduire les dépendances vers des bibliothèques extérieures.</p>
+<p>Un binaire dont l’emprunte mémoire est faible, sera noté favorablement.</p>
+<h2 id="prérequis"><a href="#prérequis">Prérequis</a></h2>
+<p>Pour tester votre code, vous utiliserez un programme qui simulera les mouvements et actualisera l’image caméra de votre robot.</p>
+<p>Le simulateur est disponible à l’adresse suivante: <a href="http://tahiti.prism.uvsq.fr/ase/projet/ASE-mars-rover.tar.gz">http://tahiti.prism.uvsq.fr/ase/projet/ASE-mars-rover.tar.gz</a> Ce même simulateur sera utilisé pour évaluer vos projets.</p>
+<p>Une fois téléchargé, l’archive doit être décompressée:</p>
+<pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">tar</span> xvf ASE-mars-rover.tar.gz
+$ <span class="kw">cd</span> ASE-mars-rover/</code></pre>
+<p>Le simulateur est composé de deux modules:</p>
+<ol style="list-style-type: decimal">
+<li>Le simulateur de terrain, à exécuter sur votre ordinateur, dont le code est dans le répertoire <code>simulator/</code></li>
+<li>Un moniteur, à exécuter sur la machine virtuelle ARM ou sur votre ordinateur, qui fait l’interface entre votre code et le simulateur de terrain.</li>
+</ol>
+<h3 id="installation-et-utilisation-du-simulateur"><a href="#installation-et-utilisation-du-simulateur">Installation et utilisation du simulateur</a></h3>
+<p>Avant de pouvoir compiler le simulateur il vous faut installer les librairies suivantes:</p>
+<ul>
+<li><p>gl (OpenGL)</p></li>
+<li><p>glew</p></li>
+<li><p>glu</p></li>
+<li><p>glut</p></li>
+<li><p>microhttpd</p></li>
+</ul>
+<p>Sous debian ou ubuntu, il vous suffit de taper la commande suivante:</p>
+<pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">sudo</span> apt-get install mesa-common-dev freeglut3-dev libglu1-mesa-dev libmicrohttpd-dev libglew-dev</code></pre>
+<p>Une fois les dépendances installées, vous pouvez faire:</p>
+<pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">make</span> -C simulator/
+<span class="kw">make</span>: Entering directory <span class="st">&#39;/home/poliveira/ASE-mars-rover/simulator&#39;</span>
+<span class="kw">cc</span> -g -Wall -std=gnu99   -c -o ase-rover.o ase-rover.c
+<span class="kw">cc</span> -g -Wall -std=gnu99   -c -o server.o server.c
+<span class="kw">cc</span> -g -Wall -std=gnu99   -c -o shaders.o shaders.c
+<span class="kw">cc</span> -g -Wall -std=gnu99   -c -o terrain.o terrain.c
+<span class="kw">cc</span> -g -Wall -std=gnu99   -c -o tga.o tga.c
+<span class="kw">cc</span> -g -o simulator ase-rover.o server.o shaders.o terrain.o tga.o -lglut -lGL -lm -lGLU -lGLEW -lmicrohttpd
+<span class="kw">make</span>: Leaving directory <span class="st">&#39;/home/poliveira/ASE-mars-rover/simulator&#39;</span></code></pre>
+<p>Si tout ce passe bien, un exécutable <code>simulator/simulator</code> sera généré. Pour lancer le simulateur il faut choisir une carte dans <code>maps/</code>, par exemple <code>map1.tga</code>, et taper:</p>
+<pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">simulator/simulator</span> maps/map1.tga</code></pre>
+<h3 id="installation-et-utilisation-du-moniteur"><a href="#installation-et-utilisation-du-moniteur">Installation et utilisation du moniteur</a></h3>
+<p>Le moniteur requiert uniquement une version <code>python2</code> récente. La version installée sur le RaspberryPi est suffisante.</p>
+<p>Pour l’utiliser il suffit de lancer la commande:</p>
+<pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">monitor/monitor.py</span> --server http://192.168.1.1:8888 ./mon-programme</code></pre>
+<p>où <code>192.168.1.1</code> est l’adresse de la machine qui exécute le simulateur et <code>./mon-programme</code> est votre exécutable.</p>
+<p>Un contrôleur démo est fourni dans l’archive, pour le lancer tapez les commandes suivantes:</p>
+<pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">sudo</span> apt-get install python-matplotlib python-numpy
+$ <span class="kw">monitor/monitor.py</span> --server http://localhost:8888 ./demo/demo.py</code></pre>
+<p>Il est conseillé d’examiner le code de <code>demo.py</code> pour comprendre comment envoyer des ordres au moniteur.</p>
+<h2 id="interfaçage-avec-le-moniteur"><a href="#interfaçage-avec-le-moniteur">Interfaçage avec le moniteur</a></h2>
+<p>Pour communiquer avec le moniteur, votre programme utilise la sortie standard. Les lignes commençant par <code>CMD</code> sont considérées comme des commandes, les autres lignes sont ignorées. A la fin de chaque commande, le simulateur répond en écrivant une ligne sur l’entrée standard.</p>
+<p>Trois commandes sont disponibles:</p>
+<ul>
+<li><p><code>CMD TURN &lt;ANGLE&gt;</code> fait tourner le robot sur lui même de <code>&lt;ANGLE&gt;</code> radians. Par exemple, <code>CMD TURN 1.57079633</code> effectue une rotation de 180 degrés.</p>
+<p>Le simulateur doit répondre <code>OK</code>.</p></li>
+<li><p><code>CMD FORWARD &lt;DISTANCE&gt;</code> fait avancer le robot de <code>&lt;DISTANCE&gt;</code> mètres. Par exemple, <code>CMD FORWARD 1.5</code> avance le robot de 1.5 mètres.</p>
+<p>Le simulateur répond <code>OK</code> si tout c’est bien passé ou tue votre programme si la commande produit une collision avec un obstacle.</p></li>
+<li><p><code>CMD CAMERA</code> demande à la caméra de profondeur de transmettre un cliché. Le simulateur transmet une image de 640x360 pixels en format PGM version P2, décrit ici <a href="http://netpbm.sourceforge.net/doc/pgm.html">http://netpbm.sourceforge.net/doc/pgm.html</a>.</p></li>
+</ul>
+<h2 id="spécifications-de-la-mission"><a href="#spécifications-de-la-mission">Spécifications de la mission</a></h2>
+<p>Votre robot sera évalué sur plusieurs cartes. Des exemples de cartes sont disponibles dans le répertoire <code>maps/</code>. Chaque carte représente la topographie d’un secteur martien carré de 512x512 mètres.</p>
+<div class="figure">
+<img src="images/carte.png" title="Exemple de carte" alt="Exemple de carte" /><p class="caption">Exemple de carte</p>
+</div>
+<p>Le centre du secteur à pour coordonnées <span class="math">\((0,0)\)</span>. Au début de chaque mission la position de votre robot est <span class="math">\((-240,-240)\)</span> et son orientation initiale <span class="math">\(-\frac{\pi}{4}\)</span>.</p>
+<p>La topographie du secteur est représentée par les niveaux de gris dans l’image, noir (0) représente 0 mètres, blanc (255) représente 10 mètres. Tout point dont l’altitude est supérieure à 0.5 mètres est infranchissable.</p>
+<p>L’objectif est toujours le même: atteindre les coordonnées <span class="math">\((0,0)\)</span> sans percuter un obstacle.</p>
+<h2 id="spécifications-du-robot"><a href="#spécifications-du-robot">Spécifications du robot</a></h2>
+<p>Le robot est considéré comme un cube de 50cm x 50 cm x 50 cm. Une tolérance de 5 mètres est admise pour atteindre l’objectif.</p>
+<p>Pour simplifier, on admet que le robot ne peut jamais percuter un obstacle en tournant sur lui même.</p>
+<p>La consommation énergétique du robot (pour alimenter tous ses composants) est de 50W. Une rotation du robot consomme 50J par radian. Un déplacement du robot consomme 100J par mètre.</p>
+<h2 id="spécifications-de-la-caméra"><a href="#spécifications-de-la-caméra">Spécifications de la caméra</a></h2>
+<p>Votre robot est équipée d’une caméra qui mesure la distance aux obstacles.</p>
+<p>La caméra peut détecter les obstacles à 100 mètres maximum. Au delà de cette distance, la caméra est aveugle.</p>
+<p>La caméra est fixée en haut de votre robot par un axe. Elle se situe à une hauteur de 50 cm au dessus du sol, son axe focal est parallèle au sol et orienté comme le robot.</p>
+<p>La caméra capture une projection en perspective de l’environnement.</p>
+<div class="figure">
+<img src="images/frustrum.png" title="Projection en perspective" alt="Projection en perspective" /><p class="caption">Projection en perspective</p>
+</div>
+<p>L’angle focal est de 45 degrés La caméra capture les objets entre deux plans, sur la figure <em>near clipping plane</em> et <em>far clipping plane</em>.</p>
+<p>La distance au <em>near clipping plane</em> est de 0.1 mètres et la distance au <em>far clippling plane</em> est de 100 mètres.</p>
+<p>Le <em>near clipping plane</em> correspond à l’image qui vous est retournée de 640 x 360 pixels. Pour calculer la valeur d’un pixel vous pouvez imaginer que des rayons sont tirés entre chaque objet et l’observateur, le pixel où le rayon traverse le <em>near clipping plane</em> est colorié en fonction de la distance parcourue par le rayon.</p>
+<p>La camera retourne une image en niveaux de gris. La couleur de chaque pixel représente la distance à la caméra pour ce point. La couleur 0 représente un point à 100 mètres ou plus. Une couleur à 255 représente un point dont la distance est inférieure à 0.1 mètres.</p>
+<p><em>Attention</em> pour simplifier la conception du simulateur, les points en dessous de la ligne d’horizon sont toujours blancs.</p>
+<div class="figure">
+<img src="images/vue.png" title="Vue du robot" alt="Vue du robot" /><p class="caption">Vue du robot</p>
+</div>
+<h2 id="remarques-finales"><a href="#remarques-finales">Remarques finales</a></h2>
+<p>Il est possible que le simulateur fourni ne corresponde pas tout à fait aux spécifications de ce document. Dans ce cas, c’est un <em>bug</em> merci de m’envoyer un mail ou encore mieux un patch :-)</p>
+<p>Bon projet !</p>
+</body>
+</html>
