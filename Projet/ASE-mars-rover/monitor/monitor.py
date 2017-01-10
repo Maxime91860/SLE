@@ -78,7 +78,7 @@ def camera(nouns):
     """
     resp = urllib2.urlopen("{server}/CAMERA"
                     .format(server=SERVER)).read()
-    #proc.stdin.write(resp+"\n")
+    proc.stdin.write(resp+"\n")
 
 def turn(nouns):
     """
@@ -95,7 +95,7 @@ def turn(nouns):
     resp = urllib2.urlopen("{server}/TURN/{angle}"
                     .format(server=SERVER, angle=degrees)).read()
 
-    #proc.stdin.write(resp+"\n")
+    proc.stdin.write(resp+"\n")
     assert(resp.startswith("OK"))
 
 def forward(nouns):
@@ -119,7 +119,7 @@ def forward(nouns):
     if "WIN" in resp:
         fail('TARGET REACHED! You win!')
 
-    #proc.stdin.write(resp+"\n")
+    proc.stdin.write(resp+"\n")
     assert(resp.startswith("OK"))
 
 """
