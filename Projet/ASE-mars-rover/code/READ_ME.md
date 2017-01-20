@@ -32,3 +32,7 @@ Dans le dossier ASE-mars-rover
 
 ###Lancer le moniteur sur une adresse particulière 
 > ` monitor/monitor.py --server http://192.168.1.1:8888 ./mon-programme`
+
+
+Bibliothèque à installer
+sudo apt-get install libnetpbm10-dev
