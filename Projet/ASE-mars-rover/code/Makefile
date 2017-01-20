@@ -1,8 +1,9 @@
 
 CC=gcc
-CFLAGS=-g -Wall -std=gnu99
+CFLAGS=-g -lm -lnetpbm 
+#-Wall -std=gnu99
 
-all : mission_rover.pgr #essai.pgr 
+all : mission_rover.pgr essai.pgr 
 
 essai.pgr : 1er_essai.c
 	$(CC) $^ $(CFLAGS) -o $@
@@ -12,3 +13,4 @@ essai.pgr : 1er_essai.c
 
 clean :
 	rm -rf *.pgr
+
