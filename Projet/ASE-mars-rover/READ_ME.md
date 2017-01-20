@@ -35,4 +35,4 @@ Dans le dossier ASE-mars-rover
 
 
 Bibliothèque à installer
-sudo apt-get install libnetpbm10-dev
+sudo apt-get install libnetpbm10-dev #http://netpbm.sourceforge.net/doc/libpgm.html - libpgm
