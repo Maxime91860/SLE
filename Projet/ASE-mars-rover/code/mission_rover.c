@@ -24,66 +24,51 @@
 //Taille robot 50cm x 50 cm x 50 cm
 int taille_image = 640*360;
 int taille_buffer_image = 640*360*4;
+char photo[640*360*4];
 
-//Récupère l'image sous forme d'une chaine de caractère, et l'écrit dans un fichier
-char* recup_camera_char(){
-	char photo[taille_buffer_image];
+//Récupère l'image sous forme d'une chaine de caractère
+void recup_camera_char(){
 	fprintf(stdout,"CMD CAMERA\n");
 	fflush(stdout);
 	read(0, photo, taille_buffer_image);
-	// FILE* photo_fd = fopen("image.txt","w");
-	// fprintf(photo_fd, "%s\n", photo);
-	return photo;
 }
 
-int** recup_camera2(int* cols, int* rows, int* max){
-	char *image_char = recup_camera_char();
-	char *pointeur;
-	int ** image;
-	int i,j;
+//Parse la photo
+int* recup_camera2(int* cols, int* rows, int* max){
+	recup_camera_char();
+	char str[] ="- This, a sample string.";
+	char * pch;
+	int* image;
+	int i = 0;
 
-	pointeur = strtok( image_char, " "); //P2
-	pointeur = strtok( NULL, " "); //La colonne 640
-	*cols = atoi(pointeur);
-	pointeur = strtok( NULL, " "); //Les lignes 340
-	*rows = atoi (pointeur);
-	pointeur = strtok( NULL, " "); //Le niveau de gris max 255
-	*max = atoi (pointeur);
 
-	image = (int**) malloc ((*rows)*sizeof(int *));
-	for(i=0; i < (*rows); i++){
-		image[i] = (int*) malloc ((*cols)*sizeof(int));
-	}
-		    
-	i=0; j=0;
-	while( pointeur != NULL ) 
+	pch = strtok (photo," "); //Magic Number
+	pch = strtok (NULL, " "); //Nombre de colonnes
+	*cols = atoi (pch);
+	pch = strtok (NULL, " "); //Nombre de lignes
+	*rows = atoi (pch);
+	pch = strtok (NULL, " "); //Niveau de gris max
+	*max = atoi (pch);
+
+	image = (int*) malloc ((*rows)*(*cols)*sizeof(int));
+	while (pch != NULL)
 	{
-		pointeur = strtok( NULL, " ");
-		if(pointeur != NULL){
-			if(i != (*rows))
-				image [i][j] = atoi(pointeur);
-			j++;
-			if(j==(*cols)){
-				i++;
-				j=0;
-			}
+		pch = strtok (NULL, " ");
+		if(pch != NULL){
+			image[i] = atoi(pch);
+			i++;
 		}
 	}
+	fprintf(stderr, "Avant return\n");
 	return image;
 }
 
 //Recupère l'image sous forme d'un tableau 2D de gray (unsigned int)
 gray** recup_camera(int* cols, int* rows, int* max){
-	// FILE* photo = recup_camera_char();
 	fprintf(stdout,"CMD CAMERA\n");
 	fflush(stdout);
 	return pgm_readpgm(stdin, cols, rows, max);
 }
-
-// gray** recup_camera(int* cols, int* rows, int* max){
-// 	FILE* photo = recup_camera_char();
-// 	return pgm_readpgm(photo, cols, rows, max);
-// }
 
 //Calcul la nouvelle position après avoir avancé d'une distance de "pas" mètres
 void calcul_nouvelle_position (double* x, double* y, double pas, double orientation){
@@ -107,7 +92,21 @@ double distance_objectif (double x, double y){
 }
 
 //Calcul la distance max que le robot peut avancer sans se crasher
-double max_distance_foward(int** image, int rows, int cols){
+double max_distance_foward(gray** image, int rows, int cols){
+	//On va calculer la distance des pixels de la ligne d'horizon
+	double min = distance( image[rows/2][cols/3] );
+	FILE* log = fopen("log.txt","a+");
+	fprintf(stderr, "bien dans max_distance_foward\n");
+	int i;
+	for(i=0; i<cols; i++){
+		fprintf(stderr, "bien dans max_distance_foward %d\n",i);
+		min = min(distance(image[rows/2][i]), distance(image[rows/2][i+1]));
+		fprintf(log, "%d, %d, %g\n",i,image[rows/2][i], distance(image[rows/2][i]));
+	}
+	return  min;
+}
+
+double max_distance_foward2(int** image, int rows, int cols){
 	//On va calculer la distance des pixels de la ligne d'horizon
 	double min = distance( image[rows/2][cols/3] );
 	FILE* log = fopen("log.txt","a+");
@@ -130,8 +129,8 @@ int main (int argc, char** argv){
 	double pas;
 
 	//Variables images
-	// gray **image;
-	int **image;
+	gray **image;
+	int* image2;
 	int cols, rows, max;
 
 	FILE* log = fopen("log.txt","a+");
@@ -140,6 +139,19 @@ int main (int argc, char** argv){
 
 
 	pgm_init(&argc, argv);
+	int differences = 0;
+	image = recup_camera(&cols, &rows, &max);
+	image2 = recup_camera2(&cols, &rows, &max);
+	int indice = 0;
+	for(i=0; i < rows; i++){
+		for(j=0; j<cols; j++){
+			if (image[i][j] != image2[indice++]){
+				differences++;
+			}
+		}
+	}
+	fprintf(stdout, "Nombre de differences : %d\n", differences);
+	fflush(stdout);
 
 
 	//Bug vient d'ici.

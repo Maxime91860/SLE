@@ -38,3 +38,62 @@ void calcul_prochain_mouvement (double x, double y, double orientation, char* vu
     }
 
     sleep(1);
+
+
+
+
+
+
+
+
+
+
+//Essai 1 strtok
+	char *image_char = recup_camera_char();
+	char *pointeur;
+	int ** image;
+	int i,j;
+
+	pointeur = strtok( image_char, " "); //P2
+	pointeur = strtok( NULL, " "); //La colonne 640
+	*cols = atoi(pointeur);
+	pointeur = strtok( NULL, " "); //Les lignes 340
+	*rows = atoi (pointeur);
+	pointeur = strtok( NULL, " "); //Le niveau de gris max 255
+	*max = atoi (pointeur);
+
+	image = (int**) malloc ((*rows)*sizeof(int *));
+	for(i=0; i < (*rows); i++){
+		image[i] = (int*) malloc ((*cols)*sizeof(int));
+	}
+		    
+	i=0; j=0;
+	while( pointeur != NULL ) 
+	{
+		pointeur = strtok( NULL, " ");
+		if(pointeur != NULL){
+			if(i != (*rows))
+				image [i][j] = atoi(pointeur);
+			j++;
+			if(j==(*cols)){
+				i++;
+				j=0;
+			}
+		}
+	}
+	return image;
+
+
+
+
+
+
+	//Récupère l'image sous forme d'une chaine de caractère, et l'écrit dans un fichier
+void recup_camera_char(){
+	fprintf(stdout,"CMD CAMERA\n");
+	fflush(stdout);
+	read(0, photo, taille_buffer_image);
+	// FILE* photo_fd = fopen("image.txt","w");
+	// fprintf(photo_fd, "%s\n", photo);
+	// return photo;
+}
