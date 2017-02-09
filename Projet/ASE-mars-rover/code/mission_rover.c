@@ -25,41 +25,94 @@
 int taille_image = 640*360;
 int taille_buffer_image = 640*360*4;
 char photo[640*360*4];
+int nb_appel = 1;
+
+
+void vide_stdin(){
+	char buffer[100000];
+	read(0, buffer, 100000);
+}
+
+void read_OK(){
+	char buffer[3];
+	read(0, buffer, 3);
+}
 
 //Récupère l'image sous forme d'une chaine de caractère
 void recup_camera_char(){
+	fprintf(stdout, "APPEL %d\n", nb_appel);
+	fflush(stdout);
+	sleep(0.5);
 	fprintf(stdout,"CMD CAMERA\n");
 	fflush(stdout);
-	read(0, photo, taille_buffer_image);
+	fprintf(stdout, "%d : avant read\n", nb_appel);
+	fflush(stdout);
+		read(0, photo, taille_buffer_image);
+	fprintf(stdout, "%d : après read\n", nb_appel);
+	fflush(stdout);
+	nb_appel++;
+}
+
+void free_image(int** image, int rows){
+	int i;
+	for (i = 0; i < rows; ++i)
+	{
+		free(image[i]);
+	}
+	free(image);
 }
 
 //Parse la photo
-int* recup_camera2(int* cols, int* rows, int* max){
+int** recup_camera2(int* cols, int* rows, int* max){
+	fprintf(stdout, "Debut parsage #%d\n", nb_appel);
+	fflush(stdout);
 	recup_camera_char();
-	char str[] ="- This, a sample string.";
 	char * pch;
-	int* image;
-	int i = 0;
+	int** image;
+	int i;
+	int ind_ligne = 0;
+	int ind_colonne = 0;
 
+	nb_appel--;
 
 	pch = strtok (photo," "); //Magic Number
+	fprintf(stdout, "Magic number : %s\n",pch);
+	fflush(stdout);
 	pch = strtok (NULL, " "); //Nombre de colonnes
 	*cols = atoi (pch);
+	fprintf(stdout, "Cols : %s\n",pch);
+	fflush(stdout);
 	pch = strtok (NULL, " "); //Nombre de lignes
 	*rows = atoi (pch);
+	fprintf(stdout, "rows : %s\n",pch);
+	fflush(stdout);
 	pch = strtok (NULL, " "); //Niveau de gris max
 	*max = atoi (pch);
+	fprintf(stdout, "Max : %s\n",pch);
+	fflush(stdout);
 
-	image = (int*) malloc ((*rows)*(*cols)*sizeof(int));
+
+
+	image = (int**) malloc ((*rows)*sizeof(int*));
+	for(i=0; i<(*rows); i++){
+		image[i] = (int*) malloc((*cols)*sizeof(int));
+	}
 	while (pch != NULL)
 	{
 		pch = strtok (NULL, " ");
 		if(pch != NULL){
-			image[i] = atoi(pch);
-			i++;
+			if(ind_ligne == (*rows))
+				break;
+			image[ind_ligne][ind_colonne++] = atoi(pch);
+			if(ind_colonne == (*cols)){
+				ind_colonne = 0;
+				ind_ligne++;
+			}
 		}
 	}
-	fprintf(stderr, "Avant return\n");
+	fprintf(stdout, "Fin parsage #%d\n", nb_appel);
+	fflush(stdout);
+	nb_appel++;
 	return image;
 }
 
@@ -94,28 +147,20 @@ double distance_objectif (double x, double y){
 //Calcul la distance max que le robot peut avancer sans se crasher
 double max_distance_foward(gray** image, int rows, int cols){
 	//On va calculer la distance des pixels de la ligne d'horizon
-	double min = distance( image[rows/2][cols/3] );
-	FILE* log = fopen("log.txt","a+");
-	fprintf(stderr, "bien dans max_distance_foward\n");
+	double min = distance( image[rows/2][0] );
 	int i;
-	for(i=0; i<cols; i++){
-		fprintf(stderr, "bien dans max_distance_foward %d\n",i);
-		min = min(distance(image[rows/2][i]), distance(image[rows/2][i+1]));
-		fprintf(log, "%d, %d, %g\n",i,image[rows/2][i], distance(image[rows/2][i]));
+	for(i=0; i<cols-1; i++){
+		min = min( min, distance(image[rows/2][i+1]));
 	}
 	return  min;
 }
 
 double max_distance_foward2(int** image, int rows, int cols){
 	//On va calculer la distance des pixels de la ligne d'horizon
-	double min = distance( image[rows/2][cols/3] );
-	FILE* log = fopen("log.txt","a+");
-	fprintf(stderr, "bien dans max_distance_foward\n");
+	double min = distance( image[rows/2][0] );
 	int i;
-	for(i=0; i<cols; i++){
-		fprintf(stderr, "bien dans max_distance_foward %d\n",i);
-		min = min(distance(image[rows/2][i]), distance(image[rows/2][i+1]));
-		fprintf(log, "%d, %d, %g\n",i,image[rows/2][i], distance(image[rows/2][i]));
+	for(i=0; i<cols-1; i++){
+		min = min( min, distance(image[rows/2][i+1]));
 	}
 	return  min;
 }
@@ -130,28 +175,13 @@ int main (int argc, char** argv){
 
 	//Variables images
 	gray **image;
-	int* image2;
+	int** image2;
 	int cols, rows, max;
 
 	FILE* log = fopen("log.txt","a+");
 
 	int i,j;
 
-
-	pgm_init(&argc, argv);
-	int differences = 0;
-	image = recup_camera(&cols, &rows, &max);
-	image2 = recup_camera2(&cols, &rows, &max);
-	int indice = 0;
-	for(i=0; i < rows; i++){
-		for(j=0; j<cols; j++){
-			if (image[i][j] != image2[indice++]){
-				differences++;
-			}
-		}
-	}
-	fprintf(stdout, "Nombre de differences : %d\n", differences);
-	fflush(stdout);
 
 
 	//Bug vient d'ici.
@@ -162,7 +192,8 @@ int main (int argc, char** argv){
 	//Pour l'illustrer nous avons fait cette boucle
 	// for(i=0; i<2; i++){
 	// 	image = recup_camera(&cols, &rows, &max);
-	// 	fprintf(stderr, "Données récupérés :\n\tNb colonnes : %d\n\tNb lignes : %d\n\tMaxGray : %d\n",cols,rows,max);
+	// 	fprintf(stdout, "Données récupérés :\n\tNb colonnes : %d\n\tNb lignes : %d\n\tMaxGray : %d\n",cols,rows,max);
+	fflush(stdout);
 	// }
 	// sleep(2);
 
@@ -172,41 +203,54 @@ int main (int argc, char** argv){
 
 	//Algorithme de navigation
 	while(1){
-		image = recup_camera2(&cols, &rows, &max);
-		pas = min (max_distance_foward(image, rows, cols) - EPSILON, distance_objectif(x,y));
-		fprintf(log, "max distance : %g, distance objectif %g\n",
-			max_distance_foward(image,rows,cols),distance_objectif(x,y) );
+		image2 = recup_camera2(&cols, &rows, &max);
+		pas = min (max_distance_foward2(image2, rows, cols) - EPSILON, distance_objectif(x,y));
+		pas = min ( pas , 20.0);
 		//On retire EPSILON car notre calcul de distance peut ne pas etre assez précis
 		//On minimise le risque de se prendre un mur en minorant le pas 
 
 		fprintf(stdout,"CMD FORWARD %g\n",pas);
 		fflush(stdout);
+		read_OK();
+
 		calcul_nouvelle_position(&x, &y, pas, orientation);
+
+		free_image(image2, rows);
+		sleep(1);
 
 		//Cas ou on rencontre un obstacle - (pas != (100-EPSILON) aussi dans le cas où le robot va
 		// sur l'objectif mais le programme s'arrete dans ce cas là).
 		//On tourne à droite, on avance de 5m ou moins, on se ré-oriente vers l'objectif.
 		if(pas != (100-EPSILON)){
 			//Tourne à droite
-			orientation -= PI/4;
-			fprintf(stdout,"CMD TURN %g\n",-PI/4);
+			orientation -= PI/3;
+			fprintf(stdout,"CMD TURN %g\n",-PI/2);
+			fflush(stdout);
+			read_OK();
+
+			// fprintf(stdout, "Avant recup_camera2 dans if\n");
 			fflush(stdout);
 
 			//Avance
-			pgm_freearray(image, rows);
-			image = recup_camera2(&cols, &rows, &max);
-			pas = min (max_distance_foward(image, rows, cols) - EPSILON, 5.0);
-			fprintf(stdout,"CMD FORWARD %g\n",pas);
+			image2 = recup_camera2(&cols, &rows, &max);
+			// fprintf(stdout, "Après recup_camera2 dans if\n");
 			fflush(stdout);
+			pas = min (max_distance_foward2(image2, rows, cols) - EPSILON, 20.0);
+			fprintf(stdout,"CMD FORWARD %g\n",pas-EPSILON);
+			fflush(stdout);
+			read_OK();
 			calcul_nouvelle_position(&x, &y, pas, orientation);
+
+			free_image(image2, rows);
 
 			//Se tourne vers l'objectif
 			calcul_orientation_objectif(x, y, &orientation);
+			fprintf(stdout,"CMD TURN %g\n",orientation);
+			fflush(stdout);
+			read_OK();
 		}
 
-		fclose(log);
-
-		sleep(1);
+		sleep(2);
 	}
 
 	sleep(3);

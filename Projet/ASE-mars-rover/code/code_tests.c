@@ -97,3 +97,29 @@ void recup_camera_char(){
 	// fprintf(photo_fd, "%s\n", photo);
 	// return photo;
 }
+
+
+
+
+		fprintf(log, "max distance : %g, distance objectif %g\n",
+			max_distance_foward(image,rows,cols),distance_objectif(x,y) );
+
+
+	
+	pgm_init(&argc, argv);
+	int differences = 0;
+	image = recup_camera(&cols, &rows, &max);
+	image2 = recup_camera2(&cols, &rows, &max);
+	for(i=0; i < rows; i++){
+		for(j=0; j<cols; j++){
+			if (image[i][j] != image2[i][j]){
+				differences++;
+			}
+		}
+	}
+	fprintf(stdout, "Nombre de differences : %d\n", differences);
+	fflush(stdout);
+
+	double dist = max_distance_foward(image, rows, cols);
+	double dist2 = max_distance_foward2(image2, rows, cols);
+	fprintf(stderr, "Distance = %g, Distance2 = %g\n",dist, dist2);
