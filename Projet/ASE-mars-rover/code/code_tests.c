@@ -123,3 +123,53 @@ void recup_camera_char(){
 	double dist = max_distance_foward(image, rows, cols);
 	double dist2 = max_distance_foward2(image2, rows, cols);
 	fprintf(stderr, "Distance = %g, Distance2 = %g\n",dist, dist2);
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// Bug vient d'ici.
+	// Pour récupérer l'image la premiere fois aucun problème, mais les fois suivantes,
+	// on a l'erreur suivante:
+	// mission_rover.pgr: bad magic number - not a pgm or pbm file
+	// Alors que ce que devrait lire la fonction pgm_readpgm sur la stdin est bien un format pgm
+	// Pour l'illustrer nous avons fait cette boucle
+	for(i=0; i<2; i++){
+		image = recup_camera(&cols, &rows, &max);
+		fprintf(stdout, "Données récupérés :\n\tNb colonnes : %d\n\tNb lignes : %d\n\tMaxGray : %d\n",cols,rows,max);
+		fflush(stdout);
+	}
+	sleep(2);
+
+	// Nous avons par la suiter choisi de parser directement la chaine de caractere lu sur le stdin
+
+
+
+
+	while(strcmp(pch, "P2") != 0){
+		pch = strtok (photo," "); //Magic Number
+		vide_stdin();
+		free(photo);
+		photo = recup_camera_char();
+		pch = strtok (photo," "); //Magic Number
+		fprintf(stderr, "Magic number : _%s_\n",pch);
+		fflush(stderr);
+	}
+
+
+	fprintf(stderr, "Magic number : _%s_\n",pch);
+	fflush(stderr);
+	fprintf(stderr, "Cols : %s\n",pch);
+	fflush(stderr);
+	fprintf(stderr, "rows : %s\n",pch);
+	fflush(stderr);
+	fprintf(stderr, "Max : %s\n",pch);
+	fflush(stderr);	

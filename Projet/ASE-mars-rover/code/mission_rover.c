@@ -17,40 +17,38 @@
 #define COORD_Y_OBJ 0.
 #define PI 3.141592653589793238462643383279
 #define ORIENTATION_INIT PI/4
-#define EPSILON 0.2
+#define EPSILON 0.40
 
 // #define min(a,b) (a<=b?a:b) //Déja défini dans /usr/include/pm.h
 
 //Taille robot 50cm x 50 cm x 50 cm
 int taille_image = 640*360;
-int taille_buffer_image = 640*360*4;
-char photo[640*360*4];
+int taille_buffer_image = 640*360*5;
 int nb_appel = 1;
 
-
 void vide_stdin(){
-	char buffer[100000];
-	read(0, buffer, 100000);
+	char buffer[taille_buffer_image];
+	read(0, buffer, taille_buffer_image);
 }
 
 void read_OK(){
-	char buffer[3];
-	read(0, buffer, 3);
+	char buffer[10];
+	read(0, buffer, 10);
 }
 
 //Récupère l'image sous forme d'une chaine de caractère
-void recup_camera_char(){
-	fprintf(stdout, "APPEL %d\n", nb_appel);
-	fflush(stdout);
-	sleep(0.5);
+char* recup_camera_char(){
+	char * photo = (char *) malloc (640*360*4*sizeof(char));
+	// fprintf(stdout, "APPEL %d\n", nb_appel);
+	// sleep(0.5);
+
 	fprintf(stdout,"CMD CAMERA\n");
 	fflush(stdout);
-	fprintf(stdout, "%d : avant read\n", nb_appel);
-	fflush(stdout);
-		read(0, photo, taille_buffer_image);
-	fprintf(stdout, "%d : après read\n", nb_appel);
-	fflush(stdout);
+
+	read(0, photo, taille_buffer_image);
+
 	nb_appel++;
+	return photo;
 }
 
 void free_image(int** image, int rows){
@@ -64,9 +62,8 @@ void free_image(int** image, int rows){
 
 //Parse la photo
 int** recup_camera2(int* cols, int* rows, int* max){
-	fprintf(stdout, "Debut parsage #%d\n", nb_appel);
-	fflush(stdout);
-	recup_camera_char();
+	// fprintf(stderr, "Debut parsage #%d\n", nb_appel);
+	char* photo = recup_camera_char();
 	char * pch;
 	int** image;
 	int i;
@@ -76,20 +73,12 @@ int** recup_camera2(int* cols, int* rows, int* max){
 	nb_appel--;
 
 	pch = strtok (photo," "); //Magic Number
-	fprintf(stdout, "Magic number : %s\n",pch);
-	fflush(stdout);
 	pch = strtok (NULL, " "); //Nombre de colonnes
 	*cols = atoi (pch);
-	fprintf(stdout, "Cols : %s\n",pch);
-	fflush(stdout);
 	pch = strtok (NULL, " "); //Nombre de lignes
 	*rows = atoi (pch);
-	fprintf(stdout, "rows : %s\n",pch);
-	fflush(stdout);
 	pch = strtok (NULL, " "); //Niveau de gris max
 	*max = atoi (pch);
-	fprintf(stdout, "Max : %s\n",pch);
-	fflush(stdout);
 
 
 
@@ -110,8 +99,7 @@ int** recup_camera2(int* cols, int* rows, int* max){
 			}
 		}
 	}
-	fprintf(stdout, "Fin parsage #%d\n", nb_appel);
-	fflush(stdout);
+	// fprintf(stderr, "Fin parsage #%d\n", nb_appel);
 	nb_appel++;
 	return image;
 }
@@ -165,6 +153,21 @@ double max_distance_foward2(int** image, int rows, int cols){
 	return  min;
 }
 
+void retourne(int** image, int* rows, int* cols, int* max){
+
+	fprintf(stdout, "CMD TURN %g\n", -PI);
+	fflush(stdout);
+
+	image = recup_camera2(&cols, &rows, &max);
+
+	int pas = min (max_distance_foward2(image, rows, cols) - EPSILON, 2.0);
+
+	
+
+
+
+}
+
 int main (int argc, char** argv){
 
 	//Variables positionnement et deplacement du robot
@@ -178,42 +181,27 @@ int main (int argc, char** argv){
 	int** image2;
 	int cols, rows, max;
 
-	FILE* log = fopen("log.txt","a+");
-
-	int i,j;
-
-
-
-	//Bug vient d'ici.
-	//Pour récupérer l'image la premiere fois aucun problème, mais les fois suivantes,
-	//on a l'erreur suivante:
-	//mission_rover.pgr: bad magic number - not a pgm or pbm file
-	//Alors que ce que devrait lire la fonction pgm_readpgm sur la stdin est bien un format pgm
-	//Pour l'illustrer nous avons fait cette boucle
-	// for(i=0; i<2; i++){
-	// 	image = recup_camera(&cols, &rows, &max);
-	// 	fprintf(stdout, "Données récupérés :\n\tNb colonnes : %d\n\tNb lignes : %d\n\tMaxGray : %d\n",cols,rows,max);
-	fflush(stdout);
-	// }
-	// sleep(2);
-
-	// Nous avons par la suiter choisi de parser directement la chaine de caractere lu sur le stdin
-
+	FILE* log = fopen("log.txt","w+");
 
 
 	//Algorithme de navigation
 	while(1){
 		image2 = recup_camera2(&cols, &rows, &max);
 		pas = min (max_distance_foward2(image2, rows, cols) - EPSILON, distance_objectif(x,y));
-		pas = min ( pas , 20.0);
+		pas = min ( pas , 50.0);
 		//On retire EPSILON car notre calcul de distance peut ne pas etre assez précis
 		//On minimise le risque de se prendre un mur en minorant le pas 
 
-		fprintf(stdout,"CMD FORWARD %g\n",pas);
+		fprintf(stderr, "--Avance vers l'OBJECTIF--\n");
+		fprintf(stdout,"CMD FORWARD %g\n",pas - EPSILON);
 		fflush(stdout);
-		read_OK();
+		vide_stdin();
 
 		calcul_nouvelle_position(&x, &y, pas, orientation);
+
+		fprintf(log, "Après CMD FORWARD OBJ %g\n",pas);
+		fprintf(log, "x=%g, y=%g\n",x,y);
+		fflush(log);
 
 		free_image(image2, rows);
 		sleep(1);
@@ -221,37 +209,62 @@ int main (int argc, char** argv){
 		//Cas ou on rencontre un obstacle - (pas != (100-EPSILON) aussi dans le cas où le robot va
 		// sur l'objectif mais le programme s'arrete dans ce cas là).
 		//On tourne à droite, on avance de 5m ou moins, on se ré-oriente vers l'objectif.
-		if(pas != (100-EPSILON)){
-			//Tourne à droite
-			orientation -= PI/3;
-			fprintf(stdout,"CMD TURN %g\n",-PI/2);
-			fflush(stdout);
-			read_OK();
+		if(pas != (50.0)){
 
-			// fprintf(stdout, "Avant recup_camera2 dans if\n");
+			fprintf(stderr, "\n\n-------------------------------\n-------------------------------\n");
+			fprintf(stderr, "-----OBSTACLE DROIT DEVANT-----");
+			fprintf(stderr, "\n-------------------------------\n-------------------------------\n\n");
+			//Tourne à droite
+			orientation = orientation - PI/2;
+			fprintf(stderr, "--Se tourne pour eviter l'OBSTACLE--\n");
+			fprintf(stdout,"CMD TURN %g\n", orientation);
 			fflush(stdout);
+			vide_stdin();
+
+			fprintf(log, "CMD TURN OBS %g\n", orientation);
+			fflush(log);
+
+			sleep (1);
+
 
 			//Avance
 			image2 = recup_camera2(&cols, &rows, &max);
-			// fprintf(stdout, "Après recup_camera2 dans if\n");
-			fflush(stdout);
-			pas = min (max_distance_foward2(image2, rows, cols) - EPSILON, 20.0);
+			pas = min (max_distance_foward2(image2, rows, cols) - EPSILON, 25.0);
+
+			fprintf(stderr, "--Avance pour eviter l'OBSTACLE--\n");
 			fprintf(stdout,"CMD FORWARD %g\n",pas-EPSILON);
 			fflush(stdout);
-			read_OK();
+			vide_stdin();
+
 			calcul_nouvelle_position(&x, &y, pas, orientation);
 
 			free_image(image2, rows);
 
+			fprintf(log, "Après CMD FORWARD OBS %g\n",pas);
+			fprintf(log, "x=%g, y=%g\n",x,y);
+			fflush(log);
+
+			sleep(1);
+
 			//Se tourne vers l'objectif
 			calcul_orientation_objectif(x, y, &orientation);
+
+			fprintf(stderr, "--Se tourne vers l'OBJECTIF--\n");
 			fprintf(stdout,"CMD TURN %g\n",orientation);
 			fflush(stdout);
-			read_OK();
+			vide_stdin();
+
+
+			fprintf(stderr, "\n\n");
+
+			fprintf(log, "CMD TURN %g\n", orientation);
+			fflush(log);
 		}
 
 		sleep(2);
 	}
+
+	fflush(log);
 
 	sleep(3);
 	exit(0);
