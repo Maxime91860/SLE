@@ -130,7 +130,7 @@ new position */
 
 /* handle_forward: handle /FORWARD/<meters> http requests */
    void handle_forward(const char * url) {
-   	const float eps = .300f;
+   	const float eps = .250f;
    	float delta;
    	sscanf(url, "/FORWARD/%f", &delta);
 
